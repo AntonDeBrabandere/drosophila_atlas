@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drosophila Development Atlas</title>
+<meta name="description" content="An interactive, single-cell-era atlas of Drosophila embryonic development. It builds on Hartenstein's Atlas of Drosophila Development and integrates Calderon et al. 2022 (Science) and Wang et al. 2025 (Cell, Flysta3D-v2).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wrap">
+    <a class="brand" href="#top">Dros<span>.</span>Atlas</a>
+    <div class="navlinks">
+      <a href="#stages">Stages</a>
+      <a href="#organs">Organ systems</a>
+      <a href="#genes">Genes</a>
+      <a href="#singlecell">Single-cell atlases</a>
+      <a href="#explorer">Calderon explorer</a>
+      <a href="#flysta">Flysta3D explorer</a>
+      <a href="#compare">Compare</a>
+      <a href="#concepts">Concepts</a>
+      <a href="#study">Self-test</a>
+      <a href="#refs">References</a>
+    </div>
+    <button class="theme-btn" id="themeBtn" title="Toggle light/dark" aria-label="Toggle colour theme">◐</button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Atlas of Drosophila development · single-cell edition</div>
+      <h1>From one nucleus to a <em>crawling larva</em> in 22 hours</h1>
+      <p class="lede">An interactive guide to embryogenesis in <i>Drosophila melanogaster</i>. It follows the classic stage-by-stage, organ-by-organ structure of Volker Hartenstein's <i>Atlas of Drosophila Development</i> and adds what the single-cell atlases of <b style="color:var(--calderon)">Calderon et al. (2022)</b> and <b style="color:var(--bgi)">BGI/Flysta3D-v2 (Wang et al., 2025)</b> found at each step.</p>
+      <div class="btn-row">
+        <a class="btn primary" href="#stages">Explore the 17 stages →</a>
+        <a class="btn" href="#explorer">Browse 162 cell states</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>17</b><span>embryonic stages</span></div>
+        <div class="stat"><b>12</b><span>organ systems</span></div>
+        <div class="stat"><b>~1.5 M</b><span>nuclei profiled (Calderon)</span></div>
+        <div class="stat"><b>3.8 M</b><span>spatial cell bins (Flysta3D-v2)</span></div>
+      </div>
+    </div>
+    <div class="hero-embryo">
+      <div id="heroEmbryo"></div>
+      <div class="fig-caption" id="heroCaption">Stage 1</div>
+      <div class="legend" id="heroLegend"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ======================= STAGES ======================= -->
+<section class="block" id="stages">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Part I · Time</div>
+      <h2>The 17 stages of embryogenesis</h2>
+      <p>The stages of Campos-Ortega &amp; Hartenstein, timed in hours after egg laying (AEL) at 25 °C. Pick a stage to see a schematic lateral view (anterior left, dorsal up) colour-coded by germ layer, the key morphogenetic events and genes, and what the two single-cell atlases found in that time window. Use the <kbd>←</kbd> <kbd>→</kbd> keys to step through.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="phase-labels" id="phaseLabels"></div>
+      <div class="phase-bar" id="phaseBar"></div>
+      <div class="timeline-bar" id="stageBar"></div>
+      <div class="timeline-note" style="margin-top:14px">Real time (h AEL), drawn to scale. Shaded: the stage you picked · blue ticks: Calderon 2-h inferred-age windows</div>
+      <svg id="hourRuler" viewBox="0 0 1000 46" preserveAspectRatio="none" style="width:100%;height:46px;display:block"></svg>
+    </div>
+
+    <div class="stage-view">
+      <div class="card stage-figure">
+        <div class="view-switch" id="viewSwitch" role="group" aria-label="Viewing angle"><button data-v="lateral" aria-pressed="true">Lateral</button><button data-v="ventral" aria-pressed="false">Ventral</button><span class="view-hint" id="viewHint"></span></div>
+        <div id="stageSvg"></div>
+        <div class="layer-toggles" id="layerToggles"></div>
+        <div class="legend" id="stageLegend"></div>
+        <div class="fig-caption">Original schematics: a lateral optical section (or, for stages 9–12, a ventral view) plus a transverse section through the mid-trunk (dashed line). The neuroblast pattern in the ventral view is schematic; for the exact map see Doe (1992). They show topology and cellular organisation, not exact proportions. Hover or tap a label (or a layer name above) to highlight that tissue, and untick a layer to hide it in both views. For the classic hand-drawn plates, see the <a id="atlasStageLink" href="https://www.sdbonline.org/sites/fly/atlas/52.htm" target="_blank" rel="noopener">Hartenstein Atlas, p. 52</a>.</div>
+        <div class="stage-nav">
+          <button id="prevStage">← Previous</button>
+          <button id="playStage">▶ Play</button>
+          <button id="svgStage" title="Download this drawing as an SVG file">⤓ SVG</button>
+          <button id="nextStage">Next →</button>
+        </div>
+      </div>
+      <div class="card" id="stageInfo"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ORGANS ======================= -->
+<section class="block alt" id="organs">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Part II · Space</div>
+      <h2>Organ systems</h2>
+      <p>The twelve chapters of Hartenstein's Atlas, rewritten as study pages. Each one covers the embryonic origin, a stage-by-stage developmental timeline, core regulators, and the single-cell view from both papers. Each also links back to the original Atlas plate.</p>
+    </div>
+    <div id="organMatrix" style="margin-bottom:28px"></div>
+    <div class="organ-tabs" id="organTabs"></div>
+    <div id="organPanel"></div>
+  </div>
+</section>
+
+<!-- ======================= GENES ======================= -->
+<section class="block" id="genes">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Part III · Molecules</div>
+      <h2>Gene cards</h2>
+      <p>Every gene on this page in one place: <b>when</b> it shows up (stages, organ timelines, Calderon inferred-age windows), <b>where</b> (organ systems and Flysta3D-v2 tissues), and <b>which cell states and regulators</b> it belongs to. Gene names anywhere on the page are links here, and every bar and chip in a card links back to the stage, organ or cell state.</p>
+    </div>
+    <div class="gene-search">
+      <input class="search" id="geneSearch" list="geneList" placeholder="Type a gene symbol (e.g. twi, GATAe, Mef2)…" autocomplete="off" aria-label="Gene symbol">
+      <datalist id="geneList"></datalist>
+      <p class="muted" style="font-size:.85rem;margin:0"><span id="geneCount"></span> · <span id="geneTry"></span></p>
+    </div>
+    <div id="geneCard" style="margin-top:18px"></div>
+  </div>
+</section>
+
+<!-- ======================= PAPERS ======================= -->
+<section class="block" id="singlecell">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Part IV · The atlases</div>
+      <h2>Two single-cell atlases of the embryo</h2>
+      <p>They answer complementary questions. Calderon et al. ask <b>when</b>: a continuous, absolute-time view of chromatin and expression in every lineage. Wang et al. ask <b>where</b>: single-cell 3D spatial transcriptomes from embryo to pupa, integrated with scRNA and scATAC.</p>
+    </div>
+
+    <div class="grid-2">
+      <article class="card paper-card">
+        <span class="tag c">Science 2022</span>
+        <h3>The continuum of <i>Drosophila</i> embryonic development at single-cell resolution</h3>
+        <div class="cite">Calderon, Blecher-Gonen, Huang, Secchia … Furlong &amp; Shendure · Science 377, eabn5800 · <a href="https://doi.org/10.1126/science.abn5800" target="_blank" rel="noopener">doi:10.1126/science.abn5800</a></div>
+        <div class="kv">
+          <div><b>976,460</b><span>sci-ATAC-seq3 nuclei (median 5,206 reads)</span></div>
+          <div><b>547,805</b><span>sci-RNA-seq3 nuclei (median 399 UMIs)</span></div>
+          <div><b>11</b><span>overlapping windows, 0–20 h at 25 °C</span></div>
+          <div><b>110,185</b><span>accessible regions (30.4 Mb, 22% of euchromatin)</span></div>
+        </div>
+        <div class="pipeline"><span>Staged collections (2 h, then 4 h)</span><em>→</em><span>Nuclei split</span><em>→</em><span>sci-ATAC / sci-RNA</span><em>→</em><span>NN age model</span><em>→</em><span>2-h inferred windows</span><em>→</em><span>Cluster &amp; link states</span></div>
+        <div class="finding"><h4>Absolute time from asynchrony</h4><p>A neural network predicts each nucleus's collection-window centre hour from its profile, and does better than a lasso model (test MSE: RNA 2.54 vs 4.72; ATAC 5.26 vs 8.8). The result is a continuum of nuclear ages, validated against bulk RNA-seq and DNase-seq time courses.</p></div>
+        <div class="finding"><h4>Minutes-scale ZGA &amp; Zelda</h4><p>Zygotic genes switch on along predicted age in 5-min steps, while maternal and silent genes do not. Zelda-bound regions open before target expression, which supports a pioneer role.</p></div>
+        <div class="finding"><h4>A lineage map in time</h4><p>The data give 268 RNA and 171 ATAC cell states (54 and 38 annotations) across nine 2-h windows, linked into acyclic directed graphs (edge weight &gt;0.2). Diversity jumps between 6 and 10 h.</p></div>
+        <div class="finding"><h4>Comprehensive regulatory compendium</h4><p>The accessible regions cover 85% of ~5,000 validated embryonic enhancers, 94% of 8,008 mesodermal CRMs and 96% of ~1 M ChIP-defined binding sites for 233 TFs. More than 40,000 new distal regions are found.</p></div>
+        <div class="finding"><h4>TF nomination</h4><p>NNLS links RNA and ATAC clusters, and a motif–expression interaction model assigns TFs to germ layers and times (Sage → salivary gland, GATAe → midgut, Awh → epidermis). FigR builds GRNs at 10–12 h.</p></div>
+        <p style="margin-top:14px"><a href="https://shendure-web.gs.washington.edu/content/members/DEAP_website/public/" target="_blank" rel="noopener">Data portal (DEAP website) ↗</a></p>
+      </article>
+
+      <article class="card paper-card bgi">
+        <span class="tag b">Cell 2025 · BGI Research</span>
+        <h3>A <i>Drosophila</i> single-cell 3D spatiotemporal multi-omics atlas (Flysta3D-v2)</h3>
+        <div class="cite">Wang, Hu, Tu, Kong … Liu, Xu &amp; Hu · Cell 188, 4734–4753 · <a href="https://doi.org/10.1016/j.cell.2025.05.047" target="_blank" rel="noopener">doi:10.1016/j.cell.2025.05.047</a></div>
+        <div class="kv">
+          <div><b>43 · 9 · 5</b><span>embryo · larva · pupa Stereo-seq samples</span></div>
+          <div><b>3,812,505</b><span>single-cell spatial bins (scStereo-seq)</span></div>
+          <div><b>238,242</b><span>scRNA-seq cells (median 6,841 UMIs, 1,707 genes)</span></div>
+          <div><b>240,573</b><span>scATAC-seq cells (median 11,772 fragments)</span></div>
+        </div>
+        <div class="pipeline"><span>Serial cryosections</span><em>→</em><span>Stereo-seq + nucleus stain</span><em>→</em><span>Cell segmentation</span><em>→</em><span>Spateo 3D</span><em>→</em><span>RAPToR / NN ages</span><em>→</em><span>NovoSpaRc, PhyloVelo, SCENIC, Pando</span></div>
+        <div class="finding"><h4>3D transcriptomes from embryo to pupa</h4><p>Embryos are sampled every 0.5–2 h, plus L1–L3 larvae and pupae P12–P72. The data give 3D patterns for 338 genes with no previously reported <i>in situ</i> pattern. Integrating with scRNA-seq lowers background, as validated by FISH.</p></div>
+        <div class="finding"><h4>Metro map of differentiation</h4><p>PhyloVelo velocity fields on co-embedded RNA+ATAC order the cell types of every tissue in the three germ layers, labelled with their top TFs: GATAe (Malpighian tubules), sage (salivary gland), Mef2, bin, srp, crp, and new candidates CG9727, CG12219, CG7368, CG12236, CG4360.</p></div>
+        <div class="finding"><h4>Where differentiation starts</h4><p>Fat body differentiates in a <b>decentralised</b> way (scattered, mixed potency). Foregut/hindgut differentiate in a <b>centralised</b> way (clustered origins, ordered stages). CNS morphometrics link cell migration to lncRNAs <i>CR30009</i>/<i>CR45388</i>.</p></div>
+        <div class="finding"><h4>The midgut, cell type by cell type</h4><p>The midgut splits into 23 subclusters (AMPs, EEs, ECs, copper cells, gastric caeca). R1–R5-like regions emerge at ~13 h in adult order, and stem cells are already regionally specified in larvae.</p></div>
+        <div class="finding"><h4><i>exex</i> regulates copper cells</h4><p>This homeodomain TF is expressed early in the copper-cell lineage and acts upstream of <i>kay</i> and <i>lab</i>, co-regulating 'dual-motif' targets. Knockdown and <i>exex<sup>KK30</sup></i> heterozygotes lose copper cells and copper homeostasis.</p></div>
+        <p style="margin-top:14px"><a href="https://db.cngb.org/stomics/flysta3d-v2/" target="_blank" rel="noopener">Flysta3D-v2 database &amp; Spateo Viewer ↗</a></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= EXPLORER ======================= -->
+<section class="block alt" id="explorer">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Interactive · from Calderon Tables S1 &amp; S3</div>
+      <h2>Cell-state explorer</h2>
+      <p>Every manually annotated sci-RNA-seq cell state in each 2-h inferred-age window, grouped by germ layer and shown in the paper's own colour codes. Pick a state to see its top marker genes, ranked by log2 fold change × detection difference among significant markers (adj. p &lt; 0.05). The bar chart shows how cell-type diversity rises and falls over embryogenesis.</p>
+    </div>
+    <div class="explorer">
+      <div>
+        <input class="search" id="stateSearch" placeholder="Search a cell type or gene across all windows (e.g. 'muscle', 'twi', 'GATAe')…">
+        <div class="diversity-chart" id="divChart"></div>
+        <div class="win-picker" id="winPicker"></div>
+        <div id="stateGroups"></div>
+      </div>
+      <aside class="card state-detail" id="stateDetail">
+        <h4>Pick a cell state</h4>
+        <p class="muted">Click a chip to see its marker genes, the stages its window covers, and which other windows contain the same annotation.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FLYSTA3D EXPLORER ======================= -->
+<section class="block" id="flysta">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker" style="color:var(--bgi)">Interactive · from Wang et al. 2025 Tables S2–S8 &amp; S10</div>
+      <h2>Flysta3D-v2 explorer</h2>
+      <p>The BGI supplementary tables, made browsable: the differentiation 'metro map' with each cell type's top TF motifs, every 3D Stereo-seq sample with its RAPToR age and tissues, the tissue subcluster catalogue, the larval/pupal midgut and <i>exex</i>/<i>lab</i> copper-cell targets, CNS morphometric genes, and the 338 genes whose spatial patterns were previously unknown. All colours are the paper's own codes (Table S10).</p>
+    </div>
+    <div class="organ-tabs" id="bgiTabs">
+      <button class="active" data-pane="paneMetro">Differentiation metro map</button>
+      <button data-pane="paneSamples">3D spatial samples</button>
+      <button data-pane="paneSub">Tissue subclusters</button>
+      <button data-pane="paneMg">Midgut &amp; copper cells</button>
+      <button data-pane="paneMorph">CNS morphometrics</button>
+      <button data-pane="paneGenes">338 new spatial genes</button>
+    </div>
+
+    <div class="bgi-pane" id="paneMetro">
+      <div class="win-picker" id="metroGL"><button class="active" data-gl="ectoderm">Ectoderm</button><button data-gl="mesoderm">Mesoderm</button><button data-gl="endoderm">Endoderm</button></div>
+      <div class="explorer">
+        <div class="card metro-wrap"><div id="metroSvg"></div>
+          <p class="muted" style="font-size:.8rem;margin:10px 0 0">Stations are the trajectory cell types of Table S6. They are ordered here from their names (anlage → primordium → early → mid → late). The paper's Fig. 2B metro plot and Fig. S3C phylogeny give the exact branching. Click a station.</p></div>
+        <aside class="card state-detail" id="metroDetail"></aside>
+      </div>
+    </div>
+
+    <div class="bgi-pane" id="paneSamples" hidden>
+      <div class="card"><div id="sampleSvg"></div></div>
+      <div class="card" style="margin-top:16px" id="sampleDetail"></div>
+    </div>
+
+    <div class="bgi-pane" id="paneSub" hidden>
+      <div class="organ-tabs" id="subTissues"></div>
+      <div class="table-scroll" id="subTable"></div>
+    </div>
+
+    <div class="bgi-pane" id="paneMg" hidden>
+      <div class="grid-2">
+        <div class="card"><h4>Midgut cell types in larval &amp; pupal Stereo-seq (Table S4)</h4>
+          <div class="win-picker" id="mgStages"></div><div class="state-chips" id="mgList"></div>
+          <p class="muted" style="font-size:.8rem;margin-top:12px">The enterocyte subtypes are named by marker. Note how gastric caecum and EC (<i>Acbp3</i>+) disappear by late L3, when the midgut is remodelled before metamorphosis.</p></div>
+        <div class="card"><h4><i>exex</i> &amp; <i>lab</i> motif peaks in copper cells (Table S8)</h4><div id="exexBox"></div></div>
+      </div>
+    </div>
+
+    <div class="bgi-pane" id="paneMorph" hidden>
+      <p class="muted">Genes whose expression best explains the CNS morphometric scores between consecutive 3D Stereo-seq embryos (Table S7; ranked by q-value). Hox genes (<i>Abd-B</i>, <i>abd-A</i>, <i>Antp</i>) dominate the early VNC transitions, and head genes (<i>tll</i>, <i>toy</i>) dominate the later brain transitions.</p>
+      <div class="table-scroll" id="morphTable"></div>
+    </div>
+
+    <div class="bgi-pane" id="paneGenes" hidden>
+      <input class="search" id="genesSearch" placeholder="Filter by gene, cell type or tissue (e.g. 'midgut', 'CG', 'trachea')…">
+      <p class="muted" id="genesCount" style="font-size:.85rem"></p>
+      <div class="table-scroll" id="genesTable" style="max-height:520px;overflow:auto"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= COMPARE ======================= -->
+<section class="block" id="compare">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Side by side</div>
+      <h2>How the two atlases compare and connect</h2>
+      <p>The two atlases build on each other. Calderon et al. projected their annotations onto Stereo-seq embryos from the <i>first</i> BGI Drosophila study (Wang et al., 2022, Dev Cell). Flysta3D-v2 in turn used Calderon's neural-network age model to date its own scATAC-seq cells.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="compare">
+        <thead><tr><th></th><th class="c">Calderon et al. 2022</th><th class="b">Wang et al. 2025 (Flysta3D-v2)</th></tr></thead>
+        <tbody>
+          <tr><td>Central question</td><td>When do enhancers, TFs and genes change, in absolute time, per lineage?</td><td>Where are cell types and regulators in 3D, and how do tissues differentiate in space?</td></tr>
+          <tr><td>Modalities</td><td>sci-ATAC-seq3, sci-RNA-seq3 (separate nuclei, same collections)</td><td>scStereo-seq (spatial), droplet scRNA-seq (MGI C4), scATAC-seq; integrated</td></tr>
+          <tr><td>Developmental span</td><td>Embryo 0–20 h AEL</td><td>Embryo → L1–L3 larvae → pupae (P12–P72)</td></tr>
+          <tr><td>Sampling</td><td>11 overlapping windows (2 h early, 4 h from 3 h onward)</td><td>Embryos every 0.5–2 h (Stereo-seq), 2-h windows (scRNA/scATAC)</td></tr>
+          <tr><td>Scale</td><td>~976 k ATAC + ~548 k RNA nuclei</td><td>3.8 M spatial bins, 238 k RNA + 241 k ATAC cells, 18 k L3 midgut cells</td></tr>
+          <tr><td>Depth per cell</td><td>RNA median 399 UMIs / 274 genes; ATAC 5,206 reads</td><td>RNA median 6,841 UMIs / 1,707 genes; ATAC 11,772 fragments</td></tr>
+          <tr><td>Timing model</td><td>Neural-network inferred nuclear age (absolute)</td><td>RAPToR for Stereo-seq/scRNA; Calderon NN model for scATAC</td></tr>
+          <tr><td>Lineage inference</td><td>Nearest-neighbour linking of states across adjacent 2-h windows</td><td>PhyloVelo velocity fields, Dynamo (midgut), CytoTRACE</td></tr>
+          <tr><td>Regulatory inference</td><td>Motif–expression correlation, NNLS cluster linking, interaction-term model, FigR</td><td>Differential motifs + target enrichment, SCENIC / pySCENIC, Pando</td></tr>
+          <tr><td>Showcase biology</td><td>ZGA/Zelda, neuronal diversity, mesoderm gene modules (Kah → Mhc)</td><td>Midgut regionalisation, copper-cell regulator <i>exex</i>, CNS morphometrics</td></tr>
+          <tr><td>Resource</td><td><a href="https://shendure-web.gs.washington.edu/content/members/DEAP_website/public/" target="_blank" rel="noopener">DEAP website</a>; GEO</td><td><a href="https://db.cngb.org/stomics/flysta3d-v2/" target="_blank" rel="noopener">Flysta3D-v2</a>, Spateo Viewer; Mendeley Data</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:44px">Coverage across the life cycle</h3>
+    <div class="lifecycle" id="lifecycle"></div>
+    <div class="legend"><span><i style="background:var(--calderon)"></i>Calderon et al.</span><span><i style="background:var(--bgi)"></i>Flysta3D-v2</span></div>
+  </div>
+</section>
+
+<!-- ======================= CONCEPTS ======================= -->
+<section class="block alt" id="concepts">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Methods primer</div>
+      <h2>Concepts you need to read these papers</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card concept"><h4>Combinatorial indexing (sci-)</h4><p>Nuclei are split across plates and barcoded in rounds: tagmentation or RT, then ligation, then PCR. Each nucleus ends up with a unique barcode combination, which allows millions of nuclei without droplets. Coverage per nucleus is lower, but numbers are huge.</p></div>
+      <div class="card concept"><h4>scATAC-seq &amp; motif accessibility</h4><p>Tn5 inserts into open chromatin. Peaks are putative enhancers and promoters. Aggregating peaks that contain a TF's PWM (chromVAR-style deviations) gives a 'motif activity' per cell. TF families share motifs, so paralogs have to be told apart with expression.</p></div>
+      <div class="card concept"><h4>Inferred age vs pseudotime</h4><p>Pseudotime is relative progress along a trajectory. Inferred age (Calderon) is trained against real collection times, so it is in hours and comparable across lineages. That makes it possible to say "gene X turns on in the mesoderm 30 min before Y".</p></div>
+      <div class="card concept"><h4>Stereo-seq</h4><p>A DNA-nanoball-patterned chip with spatial barcodes captures polyA RNA from a tissue section at sub-micron spot pitch. Nucleus staining plus segmentation groups spots into single-cell bins, and Spateo aligns serial sections into a 3D embryo.</p></div>
+      <div class="card concept"><h4>Label transfer &amp; integration</h4><p>Seurat anchors or NovoSpaRc map annotations or expression from deep scRNA-seq onto sparse spatial bins. CCA co-embedding pairs ATAC and RNA cells (FigR) when they were not measured in the same cell.</p></div>
+      <div class="card concept"><h4>GRN inference</h4><p>SCENIC finds TF regulons as co-expressed targets with motif support. Pando and FigR use peak–gene links plus motifs, and NNLS decomposes one modality as a mixture of clusters from the other. All of these generate hypotheses to test with genetics, as with <i>exex</i>.</p></div>
+    </div>
+
+    <h3 style="margin-top:44px">Glossary of abbreviations (as in the original Atlas plates)</h3>
+    <div class="card"><div class="gloss" id="glossary"></div></div>
+  </div>
+</section>
+
+<!-- ======================= STUDY ======================= -->
+<section class="block" id="study">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Exam prep</div>
+      <h2>Self-test flashcards</h2>
+      <p>Tap a card to flip it.</p>
+    </div>
+    <div class="flash-wrap" id="flashcards"></div>
+  </div>
+</section>
+
+<footer id="refs">
+  <div class="wrap">
+    <h3>References &amp; credits</h3>
+    <ol class="refs">
+      <li>Hartenstein V. <i>Atlas of Drosophila Development.</i> Cold Spring Harbor Laboratory Press, 1993. Online via The Interactive Fly: <a href="https://www.sdbonline.org/sites/fly/atlas/00atlas.htm" target="_blank" rel="noopener">sdbonline.org/sites/fly/atlas</a>. Original plates © V. Hartenstein &amp; CSHL Press. This site links to them and does not reproduce them.</li>
+      <li>Campos-Ortega JA, Hartenstein V. <i>The Embryonic Development of Drosophila melanogaster.</i> Springer, 1985 (2nd ed. 1997).</li>
+      <li>Calderon D, Blecher-Gonen R, Huang X, Secchia S, et al. The continuum of <i>Drosophila</i> embryonic development at single-cell resolution. <i>Science</i> 377, eabn5800 (2022). <a href="https://doi.org/10.1126/science.abn5800" target="_blank" rel="noopener">doi</a></li>
+      <li>Wang M, Hu Q, Tu Z, Kong L, et al. A <i>Drosophila</i> single-cell 3D spatiotemporal multi-omics atlas unveils panoramic key regulators of cell-type differentiation. <i>Cell</i> 188, 4734–4753 (2025). <a href="https://doi.org/10.1016/j.cell.2025.05.047" target="_blank" rel="noopener">doi</a></li>
+      <li>Wang M, Hu Q, Lv T, et al. High-resolution 3D spatiotemporal transcriptomic maps of developing <i>Drosophila</i> embryos and larvae. <i>Dev Cell</i> 57, 1271–1283 (2022). The first Flysta3D.</li>
+      <li>Hartenstein V, Campos-Ortega JA. Early neurogenesis in wild-type <i>Drosophila melanogaster</i>. <i>Roux's Arch Dev Biol</i> 193, 308–325 (1984).</li>
+    </ol>
+    <p>Cell-state data were extracted from Calderon et al. Tables S1 (RNA annotations) and S3 (RNA marker genes) by <code>data/extract_calderon.py</code>. Flysta3D-v2 data come from Wang et al. Tables S2–S8 and S10, extracted by <code>data/extract_bgi.py</code>. Embryo schematics are original and simplified. Built for teaching. Please cite the primary papers.</p>
+  </div>
+</footer>
+
+<script src="data/calderon_states.js"></script>
+<script src="js/data.js"></script>
+<script src="js/embryo.js"></script>
+<script src="js/organ-art.js"></script>
+<script src="data/bgi.js"></script>
+<script src="data/calderon_genes.js"></script>
+<script src="js/app.js"></script>
+<script src="js/bgi-ui.js"></script>
+<script src="js/genes.js"></script>
+<script src="js/matrix.js"></script>
+</body>
+</html>
