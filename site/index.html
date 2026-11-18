@@ -332,7 +332,15 @@
       <li>Wang M, Hu Q, Lv T, et al. High-resolution 3D spatiotemporal transcriptomic maps of developing <i>Drosophila</i> embryos and larvae. <i>Dev Cell</i> 57, 1271–1283 (2022). The first Flysta3D.</li>
       <li>Hartenstein V, Campos-Ortega JA. Early neurogenesis in wild-type <i>Drosophila melanogaster</i>. <i>Roux's Arch Dev Biol</i> 193, 308–325 (1984).</li>
     </ol>
-    <p>Cell-state data were extracted from Calderon et al. Tables S1 (RNA annotations) and S3 (RNA marker genes) by <code>data/extract_calderon.py</code>. Flysta3D-v2 data come from Wang et al. Tables S2–S8 and S10, extracted by <code>data/extract_bgi.py</code>. Embryo schematics are original and simplified. Built for teaching. Please cite the primary papers.</p>
+    <h3>Data sources</h3>
+    <p>All molecular data on this page are re-formatted extracts of the published supplementary tables below. No new data were generated. The extraction scripts ship with the site in <code>data/</code>.</p>
+    <ul class="refs">
+      <li><b>Cell states &amp; top markers</b> (<code>data/calderon_states.js</code>): Calderon et al. 2022 [3], Table S1 (annotated RNA clusters per 2-h window) and Table S3 (marker genes, adj. p &lt; 0.05), extracted by <code>data/extract_calderon.py</code>. Raw data: GEO <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE190149" target="_blank" rel="noopener">GSE190149</a>.</li>
+      <li><b>Gene → cell-state index</b> (<code>data/calderon_genes.js</code>): Calderon et al. 2022 [3], Tables S1 and S3 (all significant markers), extracted by <code>data/extract_calderon_genes.py</code>.</li>
+      <li><b>Flysta3D-v2 tissues, samples, markers, TFs, CNS morphometrics, motif peaks &amp; colours</b> (<code>data/bgi.js</code>): Wang et al. 2025 [4], Tables S2–S8 and S10, extracted by <code>data/extract_bgi.py</code>. Clustering results: Mendeley Data <a href="https://doi.org/10.17632/4zf847bxcd.1" target="_blank" rel="noopener">doi:10.17632/4zf847bxcd.1</a>. Database: <a href="https://db.cngb.org/stomics/flysta3d-v2/" target="_blank" rel="noopener">Flysta3D-v2</a>. Wang et al. 2025 is open access under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>.</li>
+      <li><b>Stages, organ timelines &amp; schematics</b>: drawn for this site after Hartenstein [1] and Campos-Ortega &amp; Hartenstein [2]. Original and simplified; no plates are reproduced.</li>
+    </ul>
+    <p>Built for teaching, non-commercial. If you use anything from this page, please cite the primary papers [3, 4] rather than this site.</p>
   </div>
 </footer>
 
